@@ -1,0 +1,28 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="{% static 'css/app.css' %}">
+</head>
+<body>
+	Hello, {{ name }}!
+	<ul id="result"></ul>
+	<button id="getdata">Get data</button>
+	<script type="text/javascript" src="{% static 'js/jquery-3.2.1.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/app.js' %}"></script>
+	<hr/>
+	<input type="text" id="userinput">
+	{% csrf_token %}
+	<button id="setdata">Set data</button>
+	<hr/>
+	<button id="start">Start</button><button id="next">Next</button>
+	<p id="target"></p>
+	
+	<div id="progressBar">
+		<div></div>
+	</div>
+	<p id="translation"></p>
+</body>
+</html>

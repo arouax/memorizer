@@ -1,0 +1,10 @@
+nohup.out
+__init__*
+__pycache__/
+migrations/
+.project
+db.sqlite3
+*.pyc
+env/
+.env
+staticfiles
