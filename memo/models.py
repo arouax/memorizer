@@ -21,8 +21,7 @@ class Word(models.Model):
     known = models.BooleanField(default=False)
     shown = models.IntegerField(
         verbose_name='Times shown',
-        blank=True,
-        null=True,
+        default = 0,
     )
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
 
