@@ -65,6 +65,13 @@ function progress(timeleft, timetotal, $element) {
 
 
 
+	function checkData() {
+		if ( wordsDict.length == 0 ) {
+			message.html('No words received. Database is empty?');
+		} else {
+			displayQuestion();
+		};
+	};
 
 
 
@@ -83,7 +90,7 @@ function progress(timeleft, timetotal, $element) {
 				wordsIndex = 0;
 				message.empty();
 				firstRound = true;
-				displayQuestion();
+				checkData();
 			},
 			error: function() {
 				message.html('Could not reach server');
