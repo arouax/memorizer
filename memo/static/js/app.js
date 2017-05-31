@@ -1,23 +1,47 @@
-	var wordsDict = {};
-	var wordsIndex = 0;
-	var waitingForInput = false;
-	var inProgress = false;
+var wordsDict = {};
+var wordsIndex = 0;
+var waitingForInput = false;
+var inProgress = false; // True when progress bar is shown
+var answerGiven = false;
+var errorList = {};
+var waitingForStart = false;
+var waitingForNext = false;
+var message = $('#message')
+var answer = ''
+var loopingProgress = true;
+
+
+function addError() {
+};
+
+// If progressbar ends without user input, i.e. time runs out:
+// Hides progressbar, input field, shows the translation and continuation message
+// sets waiting for next
+function progressBarEnd() {
+	//$('#progressBar').remove();
+	inProgress = false;
+	$('#userinput').css('display', 'none');
+	$('#translation').html(wordsDict[wordsIndex].translation);
+	message.html('Press Enter to continue');
+	waitingForNext = true;
+};
+
 
 function progress(timeleft, timetotal, $element) {
 	inProgress = true;
-	$('#progressBar').css('display', 'block');
 	var progressBarWidth = timeleft * $element.width() / timetotal;
-	$element.find('div').animate({ width: progressBarWidth }, timeleft == timetotal ? 0 : 100, 'linear');
-	if(timeleft > 0) {
-		setTimeout(function() {
+	$element.find('div').animate({ width: progressBarWidth }, timeleft == timetotal ? 0 : 1000, 'linear');
+	if ( timeleft >= 0 ) {
+		if (window.timer) {
+			clearTimeout(window.timer);
+		}
+		window.timer = setTimeout(function() {
 			progress(timeleft - 1, timetotal, $element);
-		}, 100);
+		}, 1000);
 	} else {
-		$('#progressBar').css('display', 'none');
-		$('#userinput').css('display', 'none');
+		progressBarEnd();
 		inProgress = false;
-		$('#translation').html(wordsDict[wordsIndex - 1].translation);
-	}
+	};
     
 };
 
@@ -28,7 +52,6 @@ function progress(timeleft, timetotal, $element) {
 
 
 
-$("document").ready(function() {
 
 
 	function getWords() {
@@ -38,20 +61,23 @@ $("document").ready(function() {
 			success: function(result) {
 				wordsDict = result.data;
 				wordsIndex = 0;
+				message.empty();
 				displayQuestion();
 			},
 			error: function() {
-				alert('Error');
+				message.html('Could not reach server');
 			},
 		});
 	};
 
 	function displayQuestion() {
+		message.empty()
 		$('#target').html(wordsDict[wordsIndex].wordcontent);
-		$('#userinput').css('display', 'initial');
+		$('#userinput').css('display', 'initial').val('').focus();
 		waitingForInput = true;
-		wordsIndex += 1;
-		progress(50, 50, $('#progressBar'));
+		answerGiven = false;
+		//$('body').append('<div id="progressBar"><div></div></div>');
+		progress(5, 5, $('#progressBar'));
 	};
 
 	function endQuestioning() {
@@ -59,10 +85,14 @@ $("document").ready(function() {
 		wordsDict = {};
 		wordsIndex = 0;
 		$('#target').html('');
+		message.empty();
 	};
 
 
-	$('#next').click(function() {
+
+
+	function nextWord() {
+		wordsIndex += 1
 		$('#translation').html('');
 		if ( waitingForInput == true && inProgress == false ) {
 			if ( wordsIndex < wordsDict.length ) {
@@ -71,19 +101,61 @@ $("document").ready(function() {
 				endQuestioning();
 			};
 		};
-	});
+	};
 
+
+	function rightAnswerGiven() {
+		answerGiven = true;
+		$('#userinput').css('display', 'none');
+		inProgress = false;
+		message.html('Press Enter to continue');
+		waitingForNext = true;
+	};
+
+
+
+
+
+
+
+// Document starts here --------------------------------------
+$("document").ready(function() {
 
 	$('#start').click(function() {
-		if ( waitingForInput == false ) {
-			getWords();
-		};
+		message.html('Press Enter to begin');
+		waitingForStart = true;
 		//displayQuestion();
 	});
 
 
+	$('#userinput').keydown(function(e) {
+		var key = e.which;
+		if ( key == 13 ) {
+			answer = $('#userinput').val();
+			if ( answer == wordsDict[wordsIndex].translation ) {
+				//$('#progressBar').remove();
+				rightAnswerGiven();
+			};
+		};
+	});
 
 
+	// if waitingForStart runs getWords
+	// if waitingForNext runs nextWord
+	$(document).keypress(function(e) {
+		if ( e.which ==	13 ) {
+			if ( waitingForStart == true ) {
+				if ( waitingForInput == false ) {
+					getWords();
+				};
+				waitingForStart = false;
+			};
+			if ( waitingForNext == true ) {
+				nextWord();
+				waitingForNext = false;
+			};
+		};
+	});
 
 
 
