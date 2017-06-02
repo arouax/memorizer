@@ -1,29 +1,54 @@
+{% extends 'memo/base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<title></title>
-	<link rel="stylesheet" type="text/css" href="{% static 'css/app.css' %}">
-</head>
-<body>
-	Hello, {{ name }}!
-	<!--<ul id="result"></ul>-->
-	<!--<button id="getdata">Get data</button>-->
-	<!--<hr/>-->
-	{% csrf_token %}
-	<!--<button id="setdata">Set data</button>-->
-	<!--<hr/>-->
-	<button id="start">Start</button>
-	<p id="target"></p>
-	
-	<div id="progressBar">
-		<div></div>
-	</div>
-	<input type="text" id="userinput">
-	<p id="message"></p>
-	<p id="translation"></p>
-	<script type="text/javascript" src="{% static 'js/jquery-3.2.1.js' %}"></script>
-	<script type="text/javascript" src="{% static 'js/app.js' %}"></script>
-</body>
-</html>
+
+{% block content %}
+
+
+<div id="hello">
+            <h1 class="cover-heading">
+							Hello, {% if request.user.is_authenticated %}<strong>{{ request.user.username }}</strong>{% else %}stranger{% endif %}!
+						</h1>
+            <p class="lead">
+						{% if request.user.is_authenticated %}
+						It's nice to see you back!
+						{% else %}
+						I don't remember your face.
+						{% endif %}
+						</p>
+            <p class="lead">
+						{% if request.user.is_authenticated %}
+              <a href="#" id="startFromHello" class="btn btn-lg btn-default">Start training</a>
+						{% else %}
+              <a href="#" class="btn btn-lg btn-default">Log in</a>
+						{% endif %}
+            </p>
+</div>
+
+
+<div id="training">
+				{% csrf_token %}
+				<button class="btn btn-default btn-lg" id="startAnotherRound">Learn more words</button>
+				<p id="target"></p>
+				
+				<div id="progressBar">
+					<div id="progress"></div>
+				</div>
+				<input type="text" id="userinput">
+				<p id="translation"></p>
+				<p id="message"></p>
+</div>
+
+
+{% endblock %}
+{% if request.user.is_authenticated %}
+{% include 'memo/navbar.html' %}
+{% endif %}
+
+			
+			
+			
+
+
+
+
+

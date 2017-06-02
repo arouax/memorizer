@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<link href="{% static 'memo/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css">
+	<link href="{% static 'memo/css/cover.css' %}" rel="stylesheet" type="text/css">
+	<link href="{% static 'memo/css/app.css' %}" rel="stylesheet" type="text/css">
+</head>
+<body>
+
+
+<div class="site-wrapper">
+
+      <div class="site-wrapper-inner">
+
+        <div class="cover-container">
+
+          <div class="masthead clearfix">
+            <div class="inner">
+              <h3 class="masthead-brand">Memorizer</h3>
+              <nav>
+                <ul class="nav masthead-nav">
+									<li class="active"><a href="{% url 'home' %}">Home</a></li>
+                  <li><a href="#">Add words</a></li>
+                  <!--<li><a href="#">Contact</a></li>-->
+                </ul>
+              </nav>
+            </div>
+          </div>
+
+          <div class="inner cover">
+
+
+
+
+	{% block content %}
+	{% endblock %}
+
+
+
+
+          </div>
+
+
+
+
+          <div class="mastfoot">
+            <div class="inner">
+              <p>Created by Arouax in 2017</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+	
+	<script src="{% static 'memo/js/jquery.min.1.12.4.js' %}" type="text/javascript"></script>
+	<script src="{% static 'memo/js/bootstrap.min.js' %}" type="text/javascript"></script>
+	<script src="{% static 'memo/js/app.js' %}" type="text/javascript"></script>
+</body>
+</html>

@@ -43,7 +43,7 @@ function progressBarEnd() {
 
 
 function progress(timeleft, timetotal, $element) {
-	$element.css('display', 'block');
+	//$element.css('display', 'block');
 	inProgress = true;
 	var progressBarWidth = timeleft * $element.width() / timetotal;
 	$element.find('div').animate({ width: progressBarWidth }, timeleft == timetotal ? 0 : 1000, 'linear');
@@ -99,12 +99,14 @@ function progress(timeleft, timetotal, $element) {
 	};
 
 	function displayQuestion() {
-		message.empty()
+		message.empty();
+		$('#translation').empty();
 		$('#target').html(wordsDict[wordsIndex].translation);
 		$('#userinput').css('display', 'initial').val('').focus();
 		waitingForInput = true;
 		answerGiven = false;
 		//$('body').append('<div id="progressBar"><div></div></div>');
+		$('#progressBar').css('display', 'block');
 		progress(5, 5, $('#progressBar'));
 	};
 
@@ -138,8 +140,28 @@ function progress(timeleft, timetotal, $element) {
 		// all rounds end - send results
 		if ( wordsDict.length == 0 ) {
 				sendResults();
+				showMistakes();
 		};
 
+	};
+
+
+	function showMistakes() {
+		$('#startAnotherRound').show();
+		if ( errorsToSend.length > 0 ) {
+			$('#training').prepend('<div id="mistakes"></div>');
+			$('#mistakes').html('<table id="mistakesTable" class="table table-hover"></table>');
+			$('#mistakesTable').append('<caption>Done. Unfortunately there were mistakes:</caption>');
+			$('#mistakesTable').append('<thead><tr><th>#</th><th>Word</th><th>Translation</th></tr></thead><tbody>');
+			for ( i = 0; i < errorsToSend.length; i++ ) {
+				var tableIndex = i + 1;
+				var line = '<tr><th scope="row">' + tableIndex  + '</th><td>' + errorsToSend[i].wordcontent + '</td><td>' + errorsToSend[i].translation + '</td></tr>'
+				$('#mistakesTable').append(line);
+			};
+			$('#mistakesTable').append('</tbody>');
+		} else {
+			$('#training').prepend('<div id="mistakes"><p>No mistakes! Congratulations!</p></div>');
+		};
 	};
 
 
@@ -179,16 +201,19 @@ function progress(timeleft, timetotal, $element) {
 		answerGiven = true;
 		$('#userinput').css('display', 'none');
 		inProgress = false;
-		message.html('Press Enter to continue');
-		waitingForNext = true;
+		//message.html('Press Enter to continue');
+		//waitingForNext = true;
+		nextWord();
 	};
 
 	function wrongAnswerGiven() {
+		inProgress = false;
 		errorList.push(wordsDict[wordsIndex]);
+		$('#translation').html(wordsDict[wordsIndex].wordcontent);
 		answerGiven = true;
 		$('#userinput').css('display', 'none');
-		inProgress = false;
 		message.html('Press Enter to continue');
+		//alert('In progress is false, waiting for next');
 		waitingForNext = true;
 	};
 
@@ -201,24 +226,38 @@ function progress(timeleft, timetotal, $element) {
 // Document starts here --------------------------------------
 $("document").ready(function() {
 
-	$('#start').click(function() {
+	$('#startAnotherRound').click(function() {
 		//listVars();
 		message.html('Press Enter to begin');
 		waitingForStart = true;
-		//displayQuestion();
+		$(this).hide();
+		$('#mistakes').remove();
 	});
+
+
+	$('#startFromHello').click(function() {
+		//listVars();
+		$('#hello').remove();
+		$('#training').css('display', 'block');
+		message.html('<h3>Press Enter to begin</h3>');
+		waitingForStart = true;
+		$(this).hide();
+	});
+
 
 
 	$('#userinput').keydown(function(e) {
 		var key = e.which;
 		if ( key == 13 ) {
 			//listVars();
+			inProgress = false;
 			$('#progressBar').css('display', 'none');
 			answer = $('#userinput').val();
 			if ( answer == wordsDict[wordsIndex].wordcontent ) {
 				//$('#progressBar').remove();
 				rightAnswerGiven();
 			} else {
+				//alert('Wrong');
 				wrongAnswerGiven();
 			};
 		};
@@ -228,8 +267,10 @@ $("document").ready(function() {
 	// if waitingForStart runs getWords
 	// if waitingForNext runs nextWord
 	$(document).keypress(function(e) {
-		if ( e.which ==	13 ) {
-		//listVars();
+		if ( e.which ==	13 && e.target.id != 'userinput' ) {
+			//listVars();
+			message.html('');
+			$('#translation').html('');
 			if ( waitingForStart == true ) {
 				if ( waitingForInput == false ) {
 					getWords();
@@ -237,6 +278,8 @@ $("document").ready(function() {
 				waitingForStart = false;
 			};
 			if ( waitingForNext == true ) {
+				//alert('next');
+				//listVars();
 				nextWord();
 				waitingForNext = false;
 			};

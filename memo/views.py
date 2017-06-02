@@ -6,14 +6,7 @@ from random import shuffle
 
 
 def home(request):
-    if request.user.is_authenticated():
-        name = request.user.username
-    else:
-        name = 'stranger'
-    context = {
-        'name': name,
-    }
-    return render(request, 'memo/home.html', context)
+    return render(request, 'memo/home.html', {})
 
 
 def getdata(request):

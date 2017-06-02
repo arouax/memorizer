@@ -19,7 +19,7 @@ from memo.views import home, getdata, setdata
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^$', home),
+    url(r'^$', home, name='home'),
     url(r'^ajax/getdata$', getdata),
     url(r'^ajax/setdata$', setdata)
 ]
