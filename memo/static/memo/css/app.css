@@ -1,7 +1,7 @@
 #progressBar {
   width: 90%;
   margin: 10px auto;
-  height: 14px;
+  height: 6px;
 	/*background-color: #0A5F44;*/
 	display: none;
 }
@@ -10,7 +10,7 @@
   height: 100%;
   text-align: center;
   padding: 0;
-  line-height: 14px; /* same as #progressBar height if we want text middle aligned */
+  line-height: 6px; /* same as #progressBar height if we want text middle aligned */
   width: 0;
   background-color: #fe4a49;
   box-sizing: border-box;
@@ -20,10 +20,26 @@
 
 #userinput {
 	display: none;
+	border: 0;
+	border-bottom: 3px solid #fed766;
+	background-color: #f2f2f2;
+	font-size: 2em;
+	text-align: center;
 }
 #training {
 	display: none;
 }
-#startAnotherRound {
-	display: none;
+
+tbody {
+	background-color: #f2f2f2;
+}
+
+#answer {
+	color: #fe4a49;
+	font-size: 3em;
+}
+
+#question {
+	color: #009fb7;
+	font-size: 3em;
 }
