@@ -23,8 +23,11 @@
               <nav>
                 <ul class="nav masthead-nav">
 									<li class="active"><a href="{% url 'home' %}">Home</a></li>
+									{% if request.user.is_authenticated %}
                   <li><a href="#">Add words</a></li>
-                  <!--<li><a href="#">Contact</a></li>-->
+									<li>Logged in as {{ request.user.username }}</li>
+									<li><a href="{% url 'logout' %}">Logout</a></li>
+									{% endif %}
                 </ul>
               </nav>
             </div>

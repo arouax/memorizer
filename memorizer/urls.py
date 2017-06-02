@@ -15,11 +15,14 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from django.contrib.auth.views import login, logout
 from memo.views import home, getdata, setdata
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', home, name='home'),
     url(r'^ajax/getdata$', getdata),
-    url(r'^ajax/setdata$', setdata)
+    url(r'^ajax/setdata$', setdata),
+    url(r'^login/$', login, name='login'),
+    url(r'^logout/$', logout, {'next_page': '/'}, name='logout'),
 ]

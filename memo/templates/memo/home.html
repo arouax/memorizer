@@ -4,24 +4,25 @@
 {% block content %}
 
 
+{% if request.user.is_authenticated %}
 <div id="hello">
-            <h1 class="cover-heading">
-							Hello, {% if request.user.is_authenticated %}<strong>{{ request.user.username }}</strong>{% else %}stranger{% endif %}!
-						</h1>
-            <p class="lead">
-						{% if request.user.is_authenticated %}
-						It's nice to see you back!
-						{% else %}
-						I don't remember your face.
-						{% endif %}
-						</p>
-            <p class="lead">
-						{% if request.user.is_authenticated %}
-              <a href="#" id="startFromHello" class="btn btn-lg btn-default">Start training</a>
-						{% else %}
-              <a href="#" class="btn btn-lg btn-default">Log in</a>
-						{% endif %}
-            </p>
+	<h1 class="cover-heading">
+		Hello, {% if request.user.is_authenticated %}<strong>{{ request.user.username }}</strong>{% else %}stranger{% endif %}!
+	</h1>
+	<p class="lead">
+	{% if request.user.is_authenticated %}
+	It's nice to see you back!
+	{% else %}
+	I don't remember your face.
+	{% endif %}
+	</p>
+	<p class="lead">
+	{% if request.user.is_authenticated %}
+		<a href="#" id="startFromHello" class="btn btn-lg btn-default">Start training</a>
+	{% else %}
+		<a href="#" class="btn btn-lg btn-default">Log in</a>
+	{% endif %}
+	</p>
 </div>
 
 
@@ -34,6 +35,14 @@
 	<p id="answer"></p>
 </div>
 
+{% else %}
+<form method="POST" action="{% url 'login' %}">
+	{% csrf_token %}
+<p><label for="id_username">Username:</label> <input type="text" name="username" maxlength="254" required id="id_username" autofocus /></p>
+<p><label for="id_password">Password:</label> <input type="password" name="password" required id="id_password" /></p>
+	<input type="submit" value="Submit">
+</form>
+{% endif %}
 
 {% endblock %}
 {% if request.user.is_authenticated %}
