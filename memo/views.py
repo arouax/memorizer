@@ -34,6 +34,7 @@ def getdata(request):
 def setdata(request):
     if (request.is_ajax() and request.method == 'POST' and request.user.is_authenticated()):
         # We receive two lists of pk's:
+        print(request.POST)
         wrong_pk_list = request.POST.getlist('wrong[]')
         right_pk_list = request.POST.getlist('right[]')
         # Update the DB, marking progress and incrementing the showing

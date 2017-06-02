@@ -1,230 +1,218 @@
-var wordsDict = [];
-var wordsIndex = 0;
-var waitingForInput = false;
-var inProgress = false; // True when progress bar is shown
-var answerGiven = false;
-var errorList = [];
-var errorsToSend = [];
-var waitingForStart = false;
-var waitingForNext = false;
-var message = $('#message')
-var answer = ''
-var loopingProgress = true;
-var firstRound = true;
-var rightAnswersList = [];
+$("document").ready(function() {
+	
+	
+	// Removes div#hello, shows div#training
+	$('#startFromHello').click(function() {
+		$('#hello').remove();
+		$('#training').show();
+		$('#message').html('Press Enter to start');
+		// Start listening for Enter
+		$(document).keypress(function(e) {
+			if ( e.key === 'Enter' ) {
+				// Stop listening for Enter
+				$(document).unbind('keypress');
+				startTheGame();
+			};
+		});
+	});
+	
+function startTheGame() {
 
-function listVars() {
-	var a = 'waitingForInput = ' + waitingForInput + '\n';
-	a += 'inProgress = ' + inProgress + '\n';
-	a += 'answerGiven = ' + answerGiven + '\n';
-	a += 'errorList = ' + errorList + '\n';
-	a += 'errorsToSend = ' + errorsToSend + '\n';
-	a += 'waitingForStart = ' + waitingForStart + '\n';
-	a += 'waitingForNext = ' + waitingForNext + '\n';
-	a += 'answer = ' + answer + '\n';
-	a += 'loopingProgress = ' + loopingProgress + '\n';
-	a += 'firstRound = ' + firstRound + '\n';
-	alert(a);
-};
+	$('#startFromHello').remove();
+	
 
-
-// If progressbar ends without user input, i.e. time runs out:
-// Hides progressbar, input field, shows the translation and continuation message
-// sets waiting for next
-function progressBarEnd() {
-	//$('#progressBar').remove();
-	inProgress = false;
-	$('#userinput').css('display', 'none');
-	$('#translation').html(wordsDict[wordsIndex].wordcontent);
-	errorList.push(wordsDict[wordsIndex]);
-	message.html('Press Enter to continue');
-	waitingForNext = true;
-};
-
-
-function progress(timeleft, timetotal, $element) {
-	//$element.css('display', 'block');
-	inProgress = true;
-	var progressBarWidth = timeleft * $element.width() / timetotal;
-	$element.find('div').animate({ width: progressBarWidth }, timeleft == timetotal ? 0 : 1000, 'linear');
-	if ( timeleft >= 0 ) {
-		if (window.timer) {
-			clearTimeout(window.timer);
-		}
-		window.timer = setTimeout(function() {
-			progress(timeleft - 1, timetotal, $element);
-		}, 1000);
-	} else {
-		progressBarEnd();
-		inProgress = false;
-		$element.css('display', 'none')
-	};
-    
-};
-
-
-
-
-	function checkData() {
-		if ( wordsDict.length == 0 ) {
-			message.html('No words received. Database is empty?');
-		} else {
-			displayQuestion();
-		};
+	var state = {
+		// if true, then start event can be activated
+		gameInProgress: false, // is set true by pressing #start... buttons
+		wordList: [],
+		errorList: [],
+		cursor: 0,
+		firstRound: true,
+		stop: false,
+		rightAnswersList: [],
+		errorsToSend: [],
 	};
 
+	getData();
 
 
 
-
-
-	function getWords() {
+	// gets data from server
+	function getData() {
+		state.gameInProgress = true;
+		// Get the data, and on success start
 		$.ajax({
 			type: "GET",
 			url: "ajax/getdata",
 			success: function(result) {
-				errorList = [];
-				rightAnswersList = [];
-				errorsToSend = [];
-				wordsDict = result.data;
-				wordsIndex = 0;
-				message.empty();
-				firstRound = true;
-				checkData();
+				state.wordList = result.data;
+				state.cursor = 0
+				state.round = 1
+				displayQuestion();
 			},
 			error: function() {
-				message.html('Could not reach server');
+				data = 'Could not reach server';
 			},
 		});
 	};
 
+
+
 	function displayQuestion() {
-		message.empty();
-		$('#translation').empty();
-		$('#target').html(wordsDict[wordsIndex].translation);
-		$('#userinput').css('display', 'initial').val('').focus();
-		waitingForInput = true;
-		answerGiven = false;
-		//$('body').append('<div id="progressBar"><div></div></div>');
-		$('#progressBar').css('display', 'block');
-		progress(5, 5, $('#progressBar'));
-	};
-
-
-
-
-	// gets errorList and firstRound
-	function endQuestioning() {
-		
-		// cleanup
-		$('#progressBar').css('display', 'none');
-		$('#target').html('');
-		clearTimeout(window.timer);
-		waitingForInput = false;
-		message.empty();
-
-		if ( errorList.length > 0 ) {
-			if ( firstRound == true ) {
-				errorsToSend = errorList.slice();
+		$('#message').empty();
+		$('#answer').empty();
+		$('#question').empty();
+		// If cursor < wordList capacity, display question
+		if ( state.cursor < state.wordList.length ) {
+		// Clear message and answer
+			$('#question').html(state.wordList[state.cursor].translation)
+			$('#userinput').val('').show().focus().keypress(function(e) {
+			if ( e.key === 'Enter' && e.target.id === 'userinput' ) {
+				$('#userinput').unbind('keypress');
+				state.stop = true;
+				$('#progressBar').find('div').stop();
+				$('#progressBar').hide();
+				answerGiven($('#userinput').val());
 			};
-			wordsDict = errorList.slice();
+			});
+			state.stop = false;
+			$('#progressBar').show();
+			progress(5, 5, $('#progressBar'));
 		} else {
-			wordsDict = [];
+			endQuestioning();
 		};
-		wordsIndex = 0;
-		errorList = [];
-		firstRound = false;
-		if ( wordsDict.length > 0 ) {
+	}
+
+
+
+	function answerGiven(answer) {
+		// Hide userinput
+		$('#userinput').unbind('keypress');
+		$('#userinput').hide();
+		// Process the answer
+		if ( answer === state.wordList[state.cursor].wordcontent ) {
+			// Answer is right
+			if ( state.firstRound ) {
+				state.rightAnswersList.push(state.wordList[state.cursor].pk);
+			};
+			state.cursor++;
 			displayQuestion();
-		};
-		// all rounds end - send results
-		if ( wordsDict.length == 0 ) {
-				sendResults();
-				showMistakes();
-		};
-
-	};
-
-
-	function showMistakes() {
-		$('#startAnotherRound').show();
-		if ( errorsToSend.length > 0 ) {
-			$('#training').prepend('<div id="mistakes"></div>');
-			$('#mistakes').html('<table id="mistakesTable" class="table table-hover"></table>');
-			$('#mistakesTable').append('<caption>Done. Unfortunately there were mistakes:</caption>');
-			$('#mistakesTable').append('<thead><tr><th>#</th><th>Word</th><th>Translation</th></tr></thead><tbody>');
-			for ( i = 0; i < errorsToSend.length; i++ ) {
-				var tableIndex = i + 1;
-				var line = '<tr><th scope="row">' + tableIndex  + '</th><td>' + errorsToSend[i].wordcontent + '</td><td>' + errorsToSend[i].translation + '</td></tr>'
-				$('#mistakesTable').append(line);
-			};
-			$('#mistakesTable').append('</tbody>');
 		} else {
-			$('#training').prepend('<div id="mistakes"><p>No mistakes! Congratulations!</p></div>');
+			// Answer is wrong
+			if ( state.firstRound ) {
+				state.errorsToSend.push(state.wordList[state.cursor]);
+			};
+			state.errorList.push(state.wordList[state.cursor]);
+			$('#message').html('Press any key');
+			$('#answer').html(state.wordList[state.cursor].wordcontent);
+			// Increment cursor and display next question after Enter is pressed
+			state.cursor++;
+			$(document).keypress(function(evt) {
+				if ( evt.key === 'Enter' && evt.target.id != 'userinput' ) {
+					$(document).unbind('keypress');
+					displayQuestion();
+				};
+			});
 		};
 	};
 
+
+
+	function endQuestioning() {
+		$('#message').empty();
+		$('#answer').empty();
+		$('#question').empty();
+		state.firstRound = false;
+		if ( state.errorList.length > 0 ) {
+			state.wordList = state.errorList.slice();
+			state.errorList = [];
+			state.cursor = 0;
+			displayQuestion();
+		} else {
+			sendResults();
+			showMistakes();
+		};
+	};
+
+
+	function progress(timeleft, timetotal, $element) {
+		var progressBarWidth = timeleft * $element.width() / timetotal;
+		// Don't animate if state.stop is true
+		if ( !state.stop ) {
+			$element.find('div').animate({ width: progressBarWidth }, timeleft == timetotal ? 0 : 1000, 'linear');
+			if ( timeleft >= 0 ) {
+				if (window.timer) {
+					clearTimeout(window.timer);
+				}
+				window.timer = setTimeout(function() {
+					progress(timeleft - 1, timetotal, $element);
+				}, 1000);
+			} else {
+				progressBarEnd();
+			};
+		};
+	};
+
+	function progressBarEnd() {
+		$('#progressBar').hide();
+		if ( state.firstRound ) {
+			state.errorsToSend.push(state.wordList[state.cursor]);
+		};
+		state.errorList.push(state.wordList[state.cursor]);
+		// Show answer
+		$('#answer').html(state.wordList[state.cursor].wordcontent);
+		// Hide userinput
+		$('#userinput').unbind('keypress');
+		$('#userinput').hide();
+		// Increment the cursor
+		state.cursor ++;
+		$('#message').html('Press any key continue');
+		$(document).keypress(function(e) {
+			if ( e.key === 'Enter' ) {
+				$(document).unbind('keypress');
+				displayQuestion();
+			};
+		});
+	};
 
 	function sendResults() {
-		var data = [];
-		for (i = 0; i < errorsToSend.length; i++ ) {
-			data.push(errorsToSend[i].pk);
-		};
+		var errorData = [];
+		for ( i = 0; i < state.errorsToSend.length; i++ ) {
+			errorData.push(state.errorsToSend[i].pk);
+		}
 		$.ajax({
 			type: "POST",
 			url: "ajax/setdata",
 			dataType: "json",
-			data: {'wrong': data, 'right': rightAnswersList},
+			data: {'wrong': errorData, 'right': state.rightAnswersList},
 			error: function() { message.html('An error occurred'); },
 		});
 	};
 
 
 
-	function nextWord() {
-		wordsIndex += 1
-		$('#translation').html('');
-		if ( waitingForInput == true && inProgress == false ) {
-			if ( wordsIndex < wordsDict.length ) {
-				displayQuestion();
-			} else {
-				endQuestioning();
+	function showMistakes() {
+		if ( state.errorsToSend.length > 0 ) {
+			$('#training').prepend('<div id="mistakes"></div>');
+			$('#mistakes').html('<table id="mistakesTable" class="table table-hover"></table>');
+			$('#mistakesTable').append('<caption>Done. Unfortunately there were mistakes:</caption>');
+			$('#mistakesTable').append('<thead><tr><th>#</th><th>Word</th><th>Translation</th></tr></thead><tbody>');
+			for ( i = 0; i < state.errorsToSend.length; i++ ) {
+				var tableIndex = i + 1;
+				var line = '<tr><th scope="row">' + tableIndex  + '</th><td>' + state.errorsToSend[i].wordcontent + '</td><td>' + state.errorsToSend[i].translation + '</td></tr>'
+				$('#mistakesTable').append(line);
 			};
+			$('#mistakesTable').append('</tbody>');
+		} else {
+			$('#training').prepend('<div id="mistakes"><p>No mistakes! Congratulations!</p></div>');
 		};
+		$('#training').append('<a href="#" id="startFromHello" class="btn btn-lg btn-default">Start one more round</a>');
+		$('#startFromHello').click(function() {
+			$('#mistakes').remove();
+			startTheGame();
+		});
 	};
 
-
-	function rightAnswerGiven() {
-		if (firstRound == true) {
-			rightAnswersList.push(wordsDict[wordsIndex].pk);
-		};
-		answerGiven = true;
-		$('#userinput').css('display', 'none');
-		inProgress = false;
-		//message.html('Press Enter to continue');
-		//waitingForNext = true;
-		nextWord();
-	};
-
-	function wrongAnswerGiven() {
-		inProgress = false;
-		errorList.push(wordsDict[wordsIndex]);
-		$('#translation').html(wordsDict[wordsIndex].wordcontent);
-		answerGiven = true;
-		$('#userinput').css('display', 'none');
-		message.html('Press Enter to continue');
-		//alert('In progress is false, waiting for next');
-		waitingForNext = true;
-	};
-
-
-
-
-
-
-
-// Document starts here --------------------------------------
-$("document").ready(function() {
 
 	$('#startAnotherRound').click(function() {
 		//listVars();
@@ -235,18 +223,10 @@ $("document").ready(function() {
 	});
 
 
-	$('#startFromHello').click(function() {
-		//listVars();
-		$('#hello').remove();
-		$('#training').css('display', 'block');
-		message.html('<h3>Press Enter to begin</h3>');
-		waitingForStart = true;
-		$(this).hide();
-	});
 
 
 
-	$('#userinput').keydown(function(e) {
+	$('#userinput--').keydown(function(e) {
 		var key = e.which;
 		if ( key == 13 ) {
 			//listVars();
@@ -266,25 +246,25 @@ $("document").ready(function() {
 
 	// if waitingForStart runs getWords
 	// if waitingForNext runs nextWord
-	$(document).keypress(function(e) {
-		if ( e.which ==	13 && e.target.id != 'userinput' ) {
-			//listVars();
-			message.html('');
-			$('#translation').html('');
-			if ( waitingForStart == true ) {
-				if ( waitingForInput == false ) {
-					getWords();
-				};
-				waitingForStart = false;
-			};
-			if ( waitingForNext == true ) {
-				//alert('next');
-				//listVars();
-				nextWord();
-				waitingForNext = false;
-			};
-		};
-	});
+	//$(document).keypress(function(e) {
+		//if ( e.which ==	13 && e.target.id != 'userinput' ) {
+			////listVars();
+			//message.html('');
+			//$('#translation').html('');
+			//if ( waitingForStart == true ) {
+				//if ( waitingForInput == false ) {
+					//getWords();
+				//};
+				//waitingForStart = false;
+			//};
+			//if ( waitingForNext == true ) {
+				////alert('next');
+				////listVars();
+				//nextWord();
+				//waitingForNext = false;
+			//};
+		//};
+	//});
 
 
 
@@ -372,5 +352,5 @@ $("document").ready(function() {
 
 
 
-
+};
 });
