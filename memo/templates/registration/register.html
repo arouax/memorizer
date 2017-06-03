@@ -1,0 +1,17 @@
+{% extends 'memo/base.html' %}
+
+{% block content %}
+{% if request.user.is_authenticated %}
+You are already registered, log out if you want to create a new profile.
+{% else %}
+<form method="POST" action="">
+<div class="form-group">
+	{{ form.as_p }}
+	{% csrf_token %}
+	<input type="submit" value="Register">
+</div>
+</form>
+{% endif %}
+
+
+{% endblock %}

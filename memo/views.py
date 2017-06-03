@@ -1,14 +1,30 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 import json
 from django.http import Http404, HttpResponse
 from .models import Word
 from random import shuffle
+from .forms import UserForm
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 
 
 def home(request):
     return render(request, 'memo/home.html', {})
 
 
+def register(request):
+    if request.user.is_authenticated():
+        return render(request, 'registration/register.html', {})
+    else:
+        form = UserCreationForm(request.POST or None)
+        if form.is_valid():
+            print(form.cleaned_data['username'])
+            # form.save()
+            return redirect('home')
+        return render(request, 'registration/register.html', {'form': form})
+
+
+# AJAX
 def getdata(request):
     """ A GET request that provides a list of dictionaries to a view """
 
@@ -31,6 +47,7 @@ def getdata(request):
         raise Http404
 
 
+# AJAX
 def setdata(request):
     if (request.is_ajax() and request.method == 'POST' and request.user.is_authenticated()):
         # We receive two lists of pk's:

@@ -36,6 +36,7 @@
 </div>
 
 {% else %}
+Login (or <a href="{% url 'register' %}">register</a>)
 <form method="POST" action="{% url 'login' %}">
 	{% csrf_token %}
 <p><label for="id_username">Username:</label> <input type="text" name="username" maxlength="254" required id="id_username" autofocus /></p>
