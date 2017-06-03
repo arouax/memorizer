@@ -1,5 +1,6 @@
 {% extends 'memo/base.html' %}
 {% load static %}
+{% load crispy_forms_tags %}
 
 {% block content %}
 
@@ -36,12 +37,13 @@
 </div>
 
 {% else %}
-Login (or <a href="{% url 'register' %}">register</a>)
+<h3>Login (or <a href="{% url 'register' %}">register</a>)</h3>
 <form method="POST" action="{% url 'login' %}">
 	{% csrf_token %}
-<p><label for="id_username">Username:</label> <input type="text" name="username" maxlength="254" required id="id_username" autofocus /></p>
-<p><label for="id_password">Password:</label> <input type="password" name="password" required id="id_password" /></p>
-	<input type="submit" value="Submit">
+	{{ form|crispy }}
+<!--<p><label for="id_username">Username:</label> <input type="text" name="username" maxlength="254" required id="id_username" autofocus /></p>-->
+<!--<p><label for="id_password">Password:</label> <input type="password" name="password" required id="id_password" /></p>-->
+	<input class="btn btn-default btn-lg" type="submit" value="Submit">
 </form>
 {% endif %}
 

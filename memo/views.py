@@ -3,13 +3,17 @@ import json
 from django.http import Http404, HttpResponse
 from .models import Word
 from random import shuffle
-from .forms import UserForm
+from .forms import LoginForm
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
 
 def home(request):
-    return render(request, 'memo/home.html', {})
+    context = {}
+    if not request.user.is_authenticated:
+        context = {'form': LoginForm}
+    return render(request, 'memo/home.html', context)
 
 
 def register(request):
@@ -18,8 +22,14 @@ def register(request):
     else:
         form = UserCreationForm(request.POST or None)
         if form.is_valid():
-            print(form.cleaned_data['username'])
-            # form.save()
+            print(form.cleaned_data)
+            new_user = form.save()
+            # messages.info(request, "Thanks for registering. You are now logged in.")
+            new_user = authenticate(
+                username=form.cleaned_data['username'],
+                password=form.cleaned_data['password1'],
+            )
+            login(request, new_user)
             return redirect('home')
         return render(request, 'registration/register.html', {'form': form})
 

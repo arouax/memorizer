@@ -1,15 +1,17 @@
 {% extends 'memo/base.html' %}
+{% load crispy_forms_tags %}
 
 {% block content %}
 {% if request.user.is_authenticated %}
 You are already registered, log out if you want to create a new profile.
 {% else %}
+<h3>Site Registration</h3>
 <form method="POST" action="">
 <div class="form-group">
-	{{ form.as_p }}
+	{{ form|crispy }}
 	{% csrf_token %}
-	<input type="submit" value="Register">
 </div>
+	<input class="btn btn-default btn-lg" type="submit" value="Register">
 </form>
 {% endif %}
 

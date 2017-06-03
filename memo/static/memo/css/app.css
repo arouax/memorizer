@@ -43,3 +43,6 @@ tbody {
 	color: #009fb7;
 	font-size: 3em;
 }
+.form-group {
+	text-align: left;
+}
