@@ -16,14 +16,18 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth.views import login, logout
-from memo.views import home, getdata, setdata, register
+from memo.views import home, getdata, setdata, addword, register, wordlist, deleteword, editword
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', home, name='home'),
     url(r'^ajax/getdata$', getdata),
     url(r'^ajax/setdata$', setdata),
+    url(r'^ajax/addword$', addword),
+    url(r'^ajax/deleteword$', deleteword),
+    url(r'^ajax/editword$', editword),
     url(r'^login/$', login, name='login'),
     url(r'^logout/$', logout, {'next_page': '/'}, name='logout'),
     url(r'^register/$', register, name='register'),
+    url(r'^words/$', wordlist, name='words'),
 ]

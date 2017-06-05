@@ -9,7 +9,10 @@ class WordAdmin(admin.ModelAdmin):
         'pos',
         'known',
         'shown',
+        'hits',
+        'misses',
         'context',
+        'user',
     )
 
 admin.site.register(Word, WordAdmin)

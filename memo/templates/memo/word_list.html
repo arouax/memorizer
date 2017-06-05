@@ -1,0 +1,59 @@
+{% extends 'memo/base.html' %}
+
+{% block content %}
+
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>#</th>
+			<th>Word</th>
+			<th>Translation</th>
+			<th>Part of speech</th>
+			<th>Context</th>
+			<th>Times shown</th>
+			<th>Hits</th>
+			<th>Misses</th>
+			<th></th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+{% for word in words %}
+<tr data-word-pk="{{ word.pk }}">
+	<th class="inner-table" scope="row"></th>
+	<td>{{ word.wordcontent }}</td>
+	<td>{{ word.translation }}</td>
+	<td>{{ word.pos_verbose_name }}</td>
+	<td>{% if word.context %}{{ word.context }}{% endif %}</td>
+	<td>{{ word.shown }}</td>
+	<td>{{ word.hits }}</td>
+	<td>{{ word.misses }}</td>
+	<td><button class="btn btn-success btn-xs edit-word">Edit</button></td>
+	<td><button class="btn btn-danger btn-xs delete-word">Delete</button></td>
+</tr>
+{% endfor %}
+
+<!-- Add word panel -->
+<tr id="add-word">
+	<th scope="row"></th>
+		{% csrf_token %}
+	<td><input id="input-wordcontent" name="input-wordcontent" type=text></input></td>
+	<td><input id="input-translation" name="input-translation" type=text></input></td>
+	<td><select id="input-pos" class="form-control">
+			{% for choice in pos_choices %}
+			<option data-pos="{{ choice.0 }}">{{ choice.1 }}</option>
+			{% endfor %}
+</select></td>
+	<td><input id="input-context" name="input-context" type=text></input></td>
+	<td></td>
+	<td></td>
+	<td></td>
+	<td><a id="btn-clear-word" class="btn btn-default btn-xs">Clear</a></td>
+	<td><a id="btn-add-word" class="btn btn-default btn-xs">Add</a></td>
+	</form>
+</tr>
+	</tbody>
+</table>
+
+
+{% endblock %}

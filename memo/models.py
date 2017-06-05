@@ -2,7 +2,14 @@ from django.db import models
 from django.conf import settings
 
 
-# Create your models here.
+class Tag(models.Model):
+    name = models.CharField(max_length=30)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+
+    def __str__(self):
+        return self.name
+
+
 class Word(models.Model):
     POS_CHOICES = (
         ('NN', 'Noun'),
@@ -24,6 +31,10 @@ class Word(models.Model):
         default = 0,
     )
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    hits = models.IntegerField(default=0)
+    misses = models.IntegerField(default=0)
+    date_added = models.DateTimeField(auto_now_add=True)
+    tags = models.ManyToManyField(Tag, blank=True)
 
     def __str__(self):
         return self.wordcontent
@@ -38,3 +49,11 @@ class Word(models.Model):
         if self.context:
             obj_dict['context'] = self.context
         return obj_dict
+
+
+    POS_CHOICES_DICT = dict((key, value) for key, value in POS_CHOICES)
+    def pos_verbose_name(self):
+        return self.POS_CHOICES_DICT[self.pos]
+
+    class Meta:
+        unique_together = ('wordcontent', 'translation', 'user')
