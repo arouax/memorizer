@@ -16,8 +16,14 @@ a:hover {
   color: #fff;
   background-color: #009fb7;
   border: 1px solid #009fb7;
+	border-bottom: 3px solid #42c5a1;
 }
-
+.btn-default:active {
+	background-color: #33cdc4 !important;
+	box-shadow: none;
+  border: 1px solid #009fb7 !important;
+	border-bottom: 3px solid #42c5a1 !important;
+}
 
 /*
  * Base structure
@@ -26,7 +32,7 @@ a:hover {
 html,
 body {
   height: 100%;
-  background-color: #eee;
+  background-color: #f4eede;
 }
 body {
   text-align: center;
@@ -63,7 +69,7 @@ table {
 .masthead-brand {
   margin-top: 10px;
   margin-bottom: 10px;
-	color: #fe4a49;
+	color: #f8bb02;
 	font-weight: bold;
 	/*border-bottom: 3px solid #fed766;*/
 }

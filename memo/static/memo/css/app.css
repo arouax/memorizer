@@ -131,7 +131,9 @@ td.edit-word input[type="text"], tr.edit-word select {
 	height: 100% !important;
 	margin: 0px;
 }
-
+.btn, .textinput {
+	border-radius: 0;
+}
 
 
 

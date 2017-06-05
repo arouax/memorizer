@@ -12,7 +12,7 @@
 	</h1>
 	{% if wordcount > 0 %}
 	<p class="lead">
-	You have {{ wordcount }} words in your vocabulary!
+	You have {{ wordcount }} word{{ wordcount|pluralize }} in your vocabulary!
 	</p>
 	<p class="lead">
 	<a href="#" id="startFromHello" class="btn btn-lg btn-default">Start training</a>
@@ -39,6 +39,8 @@
 </div>
 
 {% else %}
+<div class="row">
+	<div class="col-md-6 col-md-offset-3">
 <h3>Login (or <a href="{% url 'register' %}">register</a>)</h3>
 <form method="POST" action="{% url 'login' %}">
 	{% csrf_token %}
@@ -47,6 +49,8 @@
 <!--<p><label for="id_password">Password:</label> <input type="password" name="password" required id="id_password" /></p>-->
 	<input class="btn btn-default btn-lg" type="submit" value="Submit">
 </form>
+	</div>
+</div>
 {% endif %}
 
 {% endblock %}
