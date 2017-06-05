@@ -34,22 +34,25 @@
 {% endfor %}
 
 <!-- Add word panel -->
+<tr id="table-info">
+	<td colspan="10">Add a word</td>
+</tr>
 <tr id="add-word">
 	<th scope="row"></th>
 		{% csrf_token %}
-	<td><input id="input-wordcontent" name="input-wordcontent" type=text></input></td>
-	<td><input id="input-translation" name="input-translation" type=text></input></td>
-	<td><select id="input-pos" class="form-control">
+	<td class="add-word"><input id="input-wordcontent" name="input-wordcontent" type=text></input></td>
+	<td class="add-word"><input id="input-translation" name="input-translation" type=text></input></td>
+	<td class="add-word"><select id="input-pos" class="form-control">
 			{% for choice in pos_choices %}
 			<option data-pos="{{ choice.0 }}">{{ choice.1 }}</option>
 			{% endfor %}
 </select></td>
-	<td><input id="input-context" name="input-context" type=text></input></td>
+	<td class="add-word"><input id="input-context" name="input-context" type=text></input></td>
 	<td></td>
 	<td></td>
 	<td></td>
-	<td><a id="btn-clear-word" class="btn btn-default btn-xs">Clear</a></td>
-	<td><a id="btn-add-word" class="btn btn-default btn-xs">Add</a></td>
+	<td><a id="btn-clear-word" class="btn btn-info btn-xs">Clear</a></td>
+	<td><a id="btn-add-word" class="btn btn-info btn-xs">Add</a></td>
 	</form>
 </tr>
 	</tbody>

@@ -22,10 +22,10 @@
               <h3 class="masthead-brand">Memorizer</h3>
               <nav>
                 <ul class="nav masthead-nav">
-									<li {% if not word_active %}class="active"{% endif %}><a href="{% url 'home' %}">Home</a></li>
+									<li {% if not word_active %}class="active"{% endif %}><a href="{% url 'home' %}">Exercise</a></li>
 									{% if request.user.is_authenticated %}
 									<li {% if word_active %}class="active"{% endif %}><a href="{% url 'words' %}">Manage words</a></li>
-									<li>Logged in as {{ request.user.username }}</li>
+									<li>Logged in as <strong>{{ request.user.username }}</strong></li>
 									<li><a href="{% url 'logout' %}">Logout</a></li>
 									{% endif %}
                 </ul>

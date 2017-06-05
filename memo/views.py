@@ -13,8 +13,10 @@ from django.db import IntegrityError
 
 
 def home(request):
-    context = {}
-    if not request.user.is_authenticated:
+    if request.user.is_authenticated:
+        wordcount = Word.objects.filter(user=request.user).count()
+        context = {'wordcount': wordcount}
+    else:
         context = {'form': LoginForm}
     return render(request, 'memo/home.html', context)
 
@@ -93,13 +95,13 @@ def addword(request):
     if (request.is_ajax() and request.method == 'POST' and request.user.is_authenticated()):
         data = json.loads(request.body.decode('utf-8'))
         print(data)
-        word = Word(wordcontent=data['wordcontent'],
-                    translation=data['translation'],
+        word = Word(wordcontent=data['wordcontent'].lower(),
+                    translation=data['translation'].lower(),
                     pos=data['pos'],
                     user=request.user,
                    )
         if data.get('context'):
-            word.context = data['context']
+            word.context = data['context'].lower()
         try:
             word.save()
         except IntegrityError:
@@ -130,13 +132,13 @@ def editword(request):
             instance = get_object_or_404(Word, pk=values.get('pk'))
             if instance.user == request.user:
                 if values.get('wordcontent'):
-                    instance.wordcontent = values.get('wordcontent')
+                    instance.wordcontent = values.get('wordcontent').lower()
                 if values.get('translation'):
-                    instance.translation = values.get('translation')
+                    instance.translation = values.get('translation').lower()
                 if values.get('pos'):
                     instance.pos = values.get('pos')
                 if values.get('context') or values.get('context') == '':
-                    instance.context = values.get('context')
+                    instance.context = values.get('context').lower()
                 instance.save()
                 print('Object updated')
                 return HttpResponse(json.dumps({'success': 'Deleted'}))

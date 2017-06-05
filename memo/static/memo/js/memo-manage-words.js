@@ -152,6 +152,7 @@ $("document").ready(function() {
 		// Creating an object with selections and initial values
 		var initial = {};
 		initial.$tr = $(e.target).closest('tr');
+		initial.$tr.addClass('edit-word');
 		// Making wordcontent editable:
 		initial.$wordcontent = initial.$tr.children(':nth-child(2)');
 		initial.$wordcontent.addClass('edit-word');
@@ -208,6 +209,7 @@ $("document").ready(function() {
 	// Set values to initial and reassign onclick events
 	function undoEditWord(initial) {
 		// Set values back to initial:
+		initial.$tr.removeClass('edit-word');
 		initial.$wordcontent.html(initial.wordcontent).removeClass('edit-word');
 		initial.$translation.html(initial.translation).removeClass('edit-word');
 		initial.$pos.html(initial.pos).removeClass('edit-word');
@@ -267,6 +269,8 @@ $("document").ready(function() {
 					if ( result.success ) {
 
 						// Set all the values to input values
+						initial.$tr.removeClass('edit-word');
+
 						initial.$wordcontent.html(initial.wordcontent)
 							.text(inputWordcontent).removeClass('edit-word');
 

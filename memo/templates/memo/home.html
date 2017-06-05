@@ -8,22 +8,24 @@
 {% if request.user.is_authenticated %}
 <div id="hello">
 	<h1 class="cover-heading">
-		Hello, {% if request.user.is_authenticated %}<strong>{{ request.user.username }}</strong>{% else %}stranger{% endif %}!
+		Hello, <strong>{{ request.user.username }}</strong>!
 	</h1>
+	{% if wordcount > 0 %}
 	<p class="lead">
-	{% if request.user.is_authenticated %}
-	It's nice to see you back!
-	{% else %}
-	I don't remember your face.
-	{% endif %}
+	You have {{ wordcount }} words in your vocabulary!
 	</p>
 	<p class="lead">
-	{% if request.user.is_authenticated %}
-		<a href="#" id="startFromHello" class="btn btn-lg btn-default">Start training</a>
-	{% else %}
-		<a href="#" class="btn btn-lg btn-default">Log in</a>
-	{% endif %}
+	<a href="#" id="startFromHello" class="btn btn-lg btn-default">Start training</a>
 	</p>
+	{% else %}
+	<p class="lead">
+	You have no words in your vocabulary.
+	</p>
+	<p class="lead">
+	<a href="{% url 'words' %}" class="btn btn-lg btn-default">Add words</a>
+	</p>
+	{% endif %}
+
 </div>
 
 
