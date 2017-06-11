@@ -16,18 +16,18 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth.views import login, logout
-from memo.views import home, getdata, setdata, addword, register, wordlist, deleteword, editword
+from memo.views import (HomeView, RegisterView, DataView,
+                        WordList, AddWord, DeleteWord, EditWord)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^$', home, name='home'),
-    url(r'^ajax/getdata$', getdata),
-    url(r'^ajax/setdata$', setdata),
-    url(r'^ajax/addword$', addword),
-    url(r'^ajax/deleteword$', deleteword),
-    url(r'^ajax/editword$', editword),
+    url(r'^$', HomeView.as_view(), name='home'),
+    url(r'^ajax/data$', DataView.as_view()),
+    url(r'^ajax/addword$', AddWord.as_view()),
+    url(r'^ajax/deleteword$', DeleteWord.as_view()),
+    url(r'^ajax/editword$', EditWord.as_view()),
     url(r'^login/$', login, name='login'),
     url(r'^logout/$', logout, {'next_page': '/'}, name='logout'),
-    url(r'^register/$', register, name='register'),
-    url(r'^words/$', wordlist, name='words'),
+    url(r'^register/$', RegisterView.as_view(), name='register'),
+    url(r'^words/$', WordList.as_view(), name='words'),
 ]

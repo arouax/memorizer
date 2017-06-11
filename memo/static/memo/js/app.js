@@ -43,7 +43,7 @@ function startTheGame() {
 		// Get the data, and on success start
 		$.ajax({
 			type: "GET",
-			url: "ajax/getdata",
+			url: "ajax/data",
 			success: function(result) {
 				state.wordList = result.data;
 				state.cursor = 0
@@ -182,7 +182,7 @@ function startTheGame() {
 		}
 		$.ajax({
 			type: "POST",
-			url: "ajax/setdata",
+			url: "ajax/data",
 			dataType: "json",
 			data: {'wrong': errorData, 'right': state.rightAnswersList},
 			error: function() { message.html('An error occurred'); },
@@ -286,7 +286,7 @@ function startTheGame() {
 	$('#getdata').click(function() {
 		$.ajax({
 			type: "GET",
-			url: "ajax/getdata",
+			url: "ajax/data",
 			success: function(result) {
 				for (var i = 0; i < result.data.length; i++) {
 					var r = result.data[i];
@@ -306,7 +306,7 @@ function startTheGame() {
 	$('#setdata').click(function() {
 		$.ajax({
 			type: "POST",
-			url: "ajax/setdata",
+			url: "ajax/data",
 			dataType: "json",
 			data: {"pk": 1},
 			success: function(result) { alert("Success! " + result.data); },
